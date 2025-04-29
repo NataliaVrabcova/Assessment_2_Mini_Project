@@ -26,7 +26,7 @@ Install dependencies:
 ```bash
 pip install torch torchvision torchaudio
 pip install transformers datasets
-
+```
 ## Project Structure
 
 - `baseline/`: Running and evaluating the initial distilled model.
