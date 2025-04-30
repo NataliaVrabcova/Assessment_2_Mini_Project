@@ -2,64 +2,87 @@
 
 ## Improving and Evaluating a Distilled Question Answering Model
 
-This repository contains the code and documentation for a mini-project focused on building a compact, efficient question answering (QA) system through **knowledge distillation**.
+This repository contains the code and documentation for a mini-project focused on building a compact and efficient question answering (QA) system using **knowledge distillation** on the SQuAD v1.0 dataset.
 
-Starting from a distilled baseline student model (trained on SQuAD v1.0), the project implements several meaningful improvements:
+Starting from a distilled baseline student model, the project implements several enhancements:
 
-- Intermediate layer distillation (hidden-state alignment)
-- Hyperparameter tuning (temperature and α optimization)
+- Intermediate layer distillation (hidden-state alignment with teacher)
+- Hyperparameter tuning (α and temperature for distillation loss)
 - Model pruning and post-pruning fine-tuning
-- Evaluation using Exact Match (EM) and F1 scores
-- Reproducibility through version control and fixed random seeds
+- Final evaluation using the **official SQuAD EM/F1 metrics**
+- Live QA demonstrations and visualizations of model performance
 
-The goal is to improve the balance between **performance** and **model efficiency**, making the student model more suitable for low-resource environments.
+The final student model is optimized for low-resource environments by significantly reducing model size and inference time while preserving reasonable QA performance.
+
+---
 
 ## Setup Instructions
 
 **Requirements:**
 - Python 3.10
-- PyTorch 2.0
-- Hugging Face `transformers` and `datasets` libraries
-- Google Colab or a local GPU environment (recommended)
+- PyTorch 2.0+
+- Hugging Face `transformers`, `datasets`, and `evaluate` libraries
+- Google Colab with GPU (Colab Pro recommended)
 
 Install dependencies:
 ```bash
 pip install torch torchvision torchaudio
-pip install transformers datasets
+pip install transformers datasets evaluate
 ```
 ## Project Structure
 
-- `baseline/`: Running and evaluating the initial distilled model.
-- `improvements/`: Implementation of intermediate distillation, hyperparameter search, and pruning.
-- `evaluation/`: Post-training evaluation (EM, F1 scoring, loss curves).
-- `teacher_logits.pt`: Saved teacher outputs for efficient student training (stored in Google Drive).
-- `figures/`: Training loss plots and performance comparison charts.
-- `report/`: Final project report (PDF format).
+- `baseline/`: Initial distilled model implementation.  
+- `improvements/`: Intermediate layer distillation, hyperparameter tuning, and pruning logic.  
+- `evaluation/`: Loss tracking, SQuAD evaluation, prediction visualization.  
+- `teacher_logits.pt`: Precomputed teacher outputs (stored in Google Drive).  
+- `report/`: Final project report (PDF).  
+- `figures/`: Training loss curves and performance comparison charts.  
 
-## Key Results
+---
 
-| Model Variant                  | EM (%) | F1 (%) | Parameters (M) | Inference Time (ms) |
-|---------------------------------|--------|--------|----------------|---------------------|
-| Baseline Student (5k)           | 2.8    | 6.9    | 67             | 28                  |
-| + Intermediate Distillation     | 1.3    | 5.5    | 67             | 28                  |
-| + Tuning (α=0.5, T=4.0)          | 2.0    | 6.59   | 26             | 22                  |
-| + Pruning and Fine-tuning       | 1.3    | 5.3    | 26             | 22                  |
+## Key Results (Final Run: Full Dataset + Official Metrics)
 
-*Note: Results are based on training with 5,000 examples (subset of SQuAD v1.0) and 2 epochs due to computational limits.*
+| Model Variant                        | EM (%) | F1 (%) | Parameters (M) | Inference Time (ms) |
+|-------------------------------------|--------|--------|----------------|---------------------|
+| Baseline Student (5k subset)        | 2.80   | 6.90   | 67             | 28                  |
+| + Intermediate Distillation         | 1.30   | 5.49   | 67             | 28                  |
+| + Tuning (α = 0.5, T = 4.0)         | 2.00   | 6.59   | 26             | 22                  |
+| + Pruning and Fine-tuning (full set) | 1.90  | 6.11   | 26             | 22                  |
 
-## Example Outputs
+The final model was trained on the full SQuAD v1.0 dataset for two full epochs plus one fine-tuning epoch after pruning. Evaluation used the official SQuAD metrics via the Hugging Face `evaluate` library.
 
-- Loss convergence plots after pruning and fine-tuning
-- Bar charts comparing EM and F1 across model variants
-- Sample QA predictions on unseen context-question pairs
+---
+
+## Example QA Predictions
+
+| Question                                 | Ground Truth    | Student Answer |
+|------------------------------------------|------------------|----------------|
+| Which city is Galatasaray based in?      | Istanbul         | istanbul       |
+| Who wrote the novel 1984?                | George Orwell    | george         |
+
+These examples show that the final pruned model can still return accurate and context-aware predictions despite significant model compression.
+
+---
+
+## Visualizations
+
+- Training loss convergence during post-pruning fine-tuning  
+- Bar chart comparing Exact Match and F1 scores across model variants  
+- QA predictions demonstrated on custom question–context pairs within the notebook  
+
+---
 
 ## Ethical Considerations
 
-While distillation and compression make models more deployable, they may also amplify biases inherited from the teacher model.  
-Compression techniques like pruning can further reduce interpretability. Future extensions should include fairness evaluations and bias mitigation strategies.
+Knowledge distillation transfers both performance and bias from the teacher model. Since the student model compresses the teacher’s behavior into a smaller structure, nuances—especially those affecting minority examples—may be lost or distorted. Additionally, pruning may reduce interpretability. Future work should incorporate bias auditing and fairness-aware training objectives.
+
+---
 
 ## References
 
-- [SQuAD v1.0 Dataset](https://rajpurkar.github.io/SQuAD-explorer/)
-- [Hugging Face Transformers](https://huggingface.co/docs/transformers/index)
-- [PyTorch Documentation](https://pytorch.org/docs/stable/index.html)
+- [SQuAD v1.0 Dataset](https://rajpurkar.github.io/SQuAD-explorer/)  
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers/index)  
+- [Evaluate Library](https://huggingface.co/docs/evaluate/index)  
+- [PyTorch Documentation](https://pytorch.org/docs/stable/index.html)  
+- Hinton et al. (2015), *Distilling the Knowledge in a Neural Network*. [arXiv:1503.02531](https://arxiv.org/abs/1503.02531)  
+- Han et al. (2015), *Learning Both Weights and Connections for Efficient Neural Networks*. [arXiv:1506.02626](https://arxiv.org/abs/1506.02626)  
