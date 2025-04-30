@@ -6,13 +6,16 @@ This repository contains the code and documentation for a mini-project focused o
 
 Starting from a distilled baseline student model, the project implements several enhancements:
 
-- Intermediate layer distillation (hidden-state alignment with teacher)
+- Intermediate layer distillation (hidden-state alignment with the teacher)
 - Hyperparameter tuning (α and temperature for distillation loss)
 - Model pruning and post-pruning fine-tuning
-- Final evaluation using the **official SQuAD EM/F1 metrics**
+- Training on full SQuAD dataset (not just a subset)
+- Evaluation using the **official SQuAD EM/F1 metrics**
 - Live QA demonstrations and visualizations of model performance
+- Integration of hidden-state loss and teacher projection layer
+- Practical deployment analysis for edge-device compatibility
 
-The final student model is optimized for low-resource environments by significantly reducing model size and inference time while preserving reasonable QA performance.
+The final student model is optimized for low-resource environments, achieving strong trade-offs in accuracy, memory footprint, and latency.
 
 ---
 
@@ -22,7 +25,7 @@ The final student model is optimized for low-resource environments by significan
 - Python 3.10
 - PyTorch 2.0+
 - Hugging Face `transformers`, `datasets`, and `evaluate` libraries
-- Google Colab with GPU (Colab Pro recommended)
+- Google Colab with GPU (Colab Pro recommended for runtime stability)
 
 Install dependencies:
 ```bash
@@ -60,7 +63,7 @@ The final model was trained on the full SQuAD v1.0 dataset for two full epochs p
 | Which city is Galatasaray based in?      | Istanbul         | istanbul       |
 | Who wrote the novel 1984?                | George Orwell    | george         |
 
-These examples show that the final pruned model can still return accurate and context-aware predictions despite significant model compression.
+These predictions illustrate that even with aggressive model compression, the student model remains capable of retrieving semantically correct answers, though exact span matching (as needed for EM) can still be imperfect.
 
 ---
 
@@ -74,7 +77,7 @@ These examples show that the final pruned model can still return accurate and co
 
 ## Ethical Considerations
 
-Knowledge distillation transfers both performance and bias from the teacher model. Since the student model compresses the teacher’s behavior into a smaller structure, nuances—especially those affecting minority examples—may be lost or distorted. Additionally, pruning may reduce interpretability. Future work should incorporate bias auditing and fairness-aware training objectives.
+Knowledge distillation transfers both performance and bias from the teacher model. Since the student model compresses the teacher’s behavior into a smaller structure, nuances, especially those affecting minority examples, may be lost or distorted. Additionally, pruning may reduce interpretability. Future work should incorporate bias auditing and fairness-aware training objectives.
 
 ---
 
